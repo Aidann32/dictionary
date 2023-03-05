@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Біз туралы{% endblock %}
+
+{% block content %}
+{% if page %}
+    <div class="text-center">
+        {{ page.content.html|safe }}
+    </div>
+{% else %}
+    <div class="text-center">
+        <h1>Бұл бет әлі қосылмаған</h1>
+    </div>
+{% endif %}
+{% endblock %}

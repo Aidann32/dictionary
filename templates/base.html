@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon" href="{% static 'favicon/icon.svg' %}">
+    <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <style>
+      @font-face { font-family: DigitalStrip; src: url("{% static 'fonts/digital_strip_kz.ttf' %}"); } 
+      body{
+        font-family: DigitalStrip !important;
+      };
+    </style>
+    {% block extra_css %}
+    {% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Сөз тіркестер</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{% url 'main_page' %}">Үйге</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'about' %}">Біз туралы</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              {% if user.is_authenticated %}
+              <li class="nav-item ms-auto">
+                <a class="nav-link" href="{% url 'logout' %}">Шығу</a>
+              </li>
+              {% else %}
+              <li class="nav-item ms-auto">
+                <a class="nav-link" href="{% url 'login' %}">Кіру</a>
+              </li>
+              <li class="nav-item ms-auto">
+                <a class="nav-link" href="{% url 'register' %}">Тіркелу</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+    </nav>
+    {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+          <div {% if message.tags %} class="alert {{ message.tags }}"{% endif %} role="alert">
+            {{ message }}          
+          </div>
+          {% endfor %}
+      </ul> 
+    {% endif %}
+    <div class="container" id="content-container">
+        {% block content %}
+
+        {% endblock %}
+    </div>
+    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}" type="text/js"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Тіркеу{% endblock %}
+{% block content %} 
+
+{% load crispy_forms_tags %}         
+
+<!--Register--> 
+<div class="container py-5">
+	<h1>Тіркеу</h1>
+	<form method="POST">
+		{% csrf_token %}
+		{{ register_form|crispy }}                    
+		<button class="btn btn-primary" type="submit">Тіркеу</button>
+	</form>
+	<p class="text-center"> Егер сізде аккаунт болса, оның орнына жүйеге <a href="{% url 'login' %}">кіріңіз</a>.</p>
+</div>
+
+{% endblock %}

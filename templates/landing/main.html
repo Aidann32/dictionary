@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Басты бет{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.01.min.css">{% endblock %}
+{% block content %}
+<div class="text-center mt-5 mb-5">
+    <h2>Іздеу</h2>
+    <form action="">
+        {% csrf_token %}
+        <input class="form-control form-control-lg" type="text" placeholder="Soz tirkesin engiziniz" aria-label=".form-control-lg example" id="autoComplete"> 
+    </form>
+</div>
+
+<div class="hidden" id="display_block">
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+          <h2 class="display-5 fw-bold" id="display_phrase"></h2>
+          <h2 class="display-5 fw-bold" id="display_meaning"></h2>
+          <h3 class="col-md-8 fs-4" id="display_meta"></h3>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+<script>
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    let search_field = document.querySelector('#autoComplete');
+    let autocomplete_data = [];
+    let query = '';
+    search_field.oninput = function(){
+        query = search_field.value;
+        if (query) body = {'query': query};
+        else body = {'query': ''}
+        fetch(query_url, { 
+            method: 'POST',
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                'Content-type': 'application/json; charset=UTF-8'
+            }, 
+            body: JSON.stringify(body),
+         })
+        .then(response => { if(response.ok) return response.json(); return null;})
+        .then((data)=>{
+            if(data){ 
+            }
+        })    
+    }
+
+    let result_url = "{% url 'result' %}"
+    document.querySelector("#autoComplete").addEventListener("selection", function (event) {
+        query = search_field.value;
+        body = {
+            'query': query,
+            'value': event.detail.selection.value
+        }
+
+        fetch(result_url,{
+            method: 'POST',
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                'Content-type': 'application/json; charset=UTF-8'
+            },
+            body: JSON.stringify(body)
+        })
+        .then(response=>response.json())
+        .then(data=>{ 
+            if(data.data){
+                let display_block = document.querySelector("#display_block");
+                let display_meaning = document.querySelector("#display_meaning");
+                let display_phrase = document.querySelector("#display_phrase");
+                let display_meta = document.querySelector("#display_meta");
+                display_block.classList.remove("hidden");
+                display_meaning.innerHTML = `Мәні: ${data.data.meaning}`;
+                display_phrase.innerHTML = `Cөз тіркесі: ${data.data.phrase}`
+                display_meta.innerHTML = `Мәнінің метатілі: ${data.data.meta}`
+            } 
+        })
+    });
+
+    let query_url = {% url 'autocomplete' %};
+
+    const autoCompleteJS = new autoComplete({
+        placeHolder: "Сөз тіркесін енгізініз...",
+        data: {
+            src: async (query) =>{
+                try{
+                    const source = await fetch(query_url, { 
+                        method: 'POST',
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken"),
+                            'Content-type': 'application/json; charset=UTF-8'
+                        }, 
+                        body: JSON.stringify(body),
+                     });
+                     const data = await source.json();
+                     console.log(data.data)
+                     return data.data;
+                }catch(error){
+                    return error;
+                }
+            }
+        },
+        query: (input) => {         
+            return input;
+        },
+        resultsList: {
+            maxResults: 15
+        },
+        resultItem: {
+            highlight: true
+        },
+    });
+</script>
+{% endblock %}
